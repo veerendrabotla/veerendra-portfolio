@@ -11,10 +11,11 @@ import SettingsManager from './admin/SettingsManager';
 import SkillManager from './admin/SkillManager';
 import Inbox from './admin/Inbox';
 import { usePortfolioData } from '../hooks/usePortfolioData';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Menu } from 'lucide-react';
 
 const AdminDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [activeTab, setActiveTab] = useState('overview');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Use the hook to fetch real data from Supabase
   const { 
@@ -83,16 +84,31 @@ const AdminDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
 
   return (
     <div className="h-screen flex bg-slate-950 text-slate-200 overflow-hidden">
-      <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={onLogout} />
+      {/* Sidebar with Mobile Toggle State */}
+      <AdminSidebar 
+        activeTab={activeTab} 
+        setActiveTab={(tab) => { setActiveTab(tab); setSidebarOpen(false); }} 
+        onLogout={onLogout} 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-      <main className="flex-1 flex flex-col h-full overflow-hidden relative">
+      <main className="flex-1 flex flex-col h-full overflow-hidden relative w-full">
         {/* Top Header */}
         <header className="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
-          <h2 className="text-lg font-medium text-white capitalize flex items-center gap-2">
-            <span className="text-slate-500">CMS /</span> {activeTab.replace('-', ' ')}
-          </h2>
           <div className="flex items-center gap-4">
-             <div className="flex flex-col items-end mr-2">
+             <button 
+               onClick={() => setSidebarOpen(true)} 
+               className="md:hidden text-slate-400 hover:text-white"
+             >
+               <Menu className="w-6 h-6" />
+             </button>
+             <h2 className="text-lg font-medium text-white capitalize flex items-center gap-2">
+               <span className="text-slate-500 hidden sm:inline">CMS /</span> {activeTab.replace('-', ' ')}
+             </h2>
+          </div>
+          <div className="flex items-center gap-4">
+             <div className="flex flex-col items-end mr-2 hidden sm:flex">
                 <span className="text-sm font-bold text-white">Veerendra</span>
                 <span className="text-xs text-cyan-400">Super Admin</span>
              </div>
@@ -103,7 +119,7 @@ const AdminDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8 relative">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 relative">
            {renderContent()}
         </div>
       </main>

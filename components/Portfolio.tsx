@@ -106,6 +106,13 @@ const Portfolio: React.FC = () => {
     scrollToSection('contact');
   };
 
+  const handleBlogClick = async (blog: BlogPost) => {
+    setSelectedBlog(blog);
+    // Increment view count silently
+    const newViews = (blog.views || 0) + 1;
+    await supabase.from('blogs').update({ views: newViews }).eq('id', blog.id);
+  };
+
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!contactForm.name || !contactForm.email || !contactForm.message) return;
@@ -514,7 +521,7 @@ const Portfolio: React.FC = () => {
                   {blogs.filter(b => b.status === 'published').map((blog) => (
                      <div 
                         key={blog.id} 
-                        onClick={() => setSelectedBlog(blog)}
+                        onClick={() => handleBlogClick(blog)}
                         className="group cursor-pointer"
                      >
                         <div className="aspect-[16/9] rounded-2xl overflow-hidden mb-4 relative">
