@@ -10,8 +10,21 @@ interface AIContext {
 
 let aiClient: GoogleGenAI | null = null;
 
-if (process.env.API_KEY) {
-  aiClient = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Safe access to process.env to prevent crashing in browser environments where process is undefined
+const getApiKey = () => {
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      return process.env.API_KEY;
+    }
+  } catch (e) {
+    // Ignore reference errors
+  }
+  return null;
+};
+
+const apiKey = getApiKey();
+if (apiKey) {
+  aiClient = new GoogleGenAI({ apiKey });
 }
 
 export const sendMessageToGemini = async (message: string, context: AIContext): Promise<string> => {
